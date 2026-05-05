@@ -1,13 +1,19 @@
 # Demo Script: Clinical Trial Operations Intelligence
 ## 4-Minute Recorded Walkthrough
 **Format**: Screen recording with voiceover
-**Target**: AWS Summit booth / customer meeting / social share
+**Target**: Customer meetings / AWS Summit booth / social share
 
 ---
 
 ## The Story
 
-A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III cardiovascular trial (CARDIO-PREVENT-301) is critically behind schedule. 12 weeks in, only 988 patients enrolled against a target of 3,400. At this rate, they'll miss their FDA submission window. Using the Clinical Trials Intelligence platform, they investigate site performance, match eligible patients, and forecast completion — all from a single Snowflake-powered dashboard.
+A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III cardiovascular trial (CARDIO-PREVENT-301) is critically behind schedule. 1,330 patients enrolled across 4 cardiovascular trials against a combined target well over 10,000. At this rate, they'll miss their FDA submission window. Using the Clinical Trials Intelligence platform, they investigate site performance, match eligible patients, and forecast completion — all from a single Snowflake-powered dashboard.
+
+---
+
+## Opening (before screen recording starts)
+
+> "One of the biggest challenges in clinical trials is enrollment. 80% of trials fail to meet enrollment timelines, and every day of delay costs a pharma company between $600K and $8M in lost revenue. So we built something — let me show you what it looks like when you bring all your trial data into one governed platform and layer AI on top. This is a Phase III cardiovascular trial running across 15 sites in Asia-Pacific. It's behind schedule. Let's find out why — and what to do about it."
 
 ---
 
@@ -28,7 +34,7 @@ A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III car
 | **CURATED** | 3 Dynamic Tables | SITE_PERFORMANCE, PATIENT_ELIGIBILITY, ENROLLMENT_FORECAST_DAILY |
 | **AI** | Cortex Search + Agent | Protocol search (100 docs), Cortex Agent (SI) |
 | **ML** | FORECAST | Enrollment prediction by trial (24 series, 2160 results) |
-| **AWS** | Comprehend Medical + S3 + QuickSight | Entity extraction from criteria, document ingestion, executive analytics |
+| **AWS** | Comprehend Medical + S3 + QuickSight | Entity extraction from criteria, document storage, executive analytics |
 
 ---
 
@@ -38,33 +44,33 @@ A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III car
 
 ## Script
 
-### [0:00–0:15] THE CRISIS (Show: Streamlit app, KPI cards)
+### [0:00–0:15] THE CRISIS (Show: Streamlit app, KPI cards — Phase III + Cardiovascular filter)
 
-> "CARDIO-PREVENT-301. Phase III cardiovascular trial. Target enrollment: 3,400 patients across 15 sites in Asia-Pacific. We're 12 weeks in — and we've enrolled 988. That's 29%. At this pace, we miss our FDA submission window by 5 months. Let's investigate."
+> "4 active Phase III cardiovascular trials, 15 sites across Asia-Pacific, 1,330 patients enrolled. But CARDIO-PREVENT-301 — our flagship — target is 3,400. We're at 1,052 — not even a third. Screen-fail rate at 8.2%. At this pace, we miss our FDA submission window. Let's find out where the problem is."
 
-### [0:15–0:40] GEOSPATIAL MAP (Show: Trial Sites map)
+### [0:15–0:40] SITE MAP (Show: Trial Sites scatter map)
 
-> "15 sites across APJ. The map tells the story immediately — bubble size is enrolled patients, color is enrollment rate. Singapore General is that bright green dot — 93% of target. But look at Tan Tock Seng — barely visible. 15% enrollment, 40% screen-fail rate. One site is carrying the trial. One site is killing it."
+> "15 sites across APJ. The map tells the story immediately — bubble size is enrolled patients, color is enrollment rate. Singapore General is that dark green cluster — 88% enrollment. But look at Tan Tock Seng — small dot, 17% enrollment, 40% screen-fail rate. One site is carrying the trial. One site is killing it."
 
 ### [0:40–1:05] SITE PERFORMANCE (Show: Expand Site Performance Deep Dive)
 
-> "Horizontal bar chart — enrollment rate by site, colored by screen-fail percentage. SGH-001 at the top: 93% enrollment, 12% screen-fail. TTH-003 at the bottom: 15% enrollment, 40% screen-fail. That screen-fail rate tells me the eligibility criteria may be too strict for their patient population. Dynamic Tables refresh this every 5 minutes — no ETL pipelines to maintain."
+> "Horizontal bar chart — enrollment rate by site, colored by screen-fail percentage. SGH-001 at the top: 88% enrollment, 6% screen-fail. TTH-003 at the bottom: 17% enrollment, 40% screen-fail. That screen-fail rate tells me the eligibility criteria may be too strict for their patient population. Dynamic Tables refresh this every 5 minutes — no ETL pipelines to maintain."
 
 ### [1:05–1:30] PATIENT MATCHING (Show: Expand Patient Matching Engine)
 
-> "Here's the opportunity. The platform matched 1,500+ patients with eligibility scores above 80 who haven't been approached yet. Country-appropriate names, chronic conditions mapped to trial criteria. Patient PAT-00142 — Lim Wei Ming, 62, atrial fibrillation, already on Apixaban. Perfect candidate for CARDIO-PREVENT-301. That's AI-powered patient recruitment — no manual chart review."
+> "Here's the opportunity. The platform matched 881 patients with eligibility scores above 85 who haven't been approached yet. Country-appropriate names, chronic conditions mapped to trial criteria. Patient PAT-00060 — Wei Lee, 52, male, Singapore, atrial fibrillation with hypertension. Perfect candidate for CARDIO-PREVENT-301. That's AI-powered patient recruitment — no manual chart review."
 
 ### [1:30–1:55] ENROLLMENT FORECAST (Show: Expand Enrollment Forecast)
 
-> "Snowflake ML FORECAST — 14-day prediction for all 24 active trial-site combinations. No Python, no infrastructure. The model already learned that CARDIO-PREVENT-301 is decelerating. Without intervention, we miss target by month 8. But if we activate the matched patients and fix the screen-fail issue at TTH, the model recalculates."
+> "Snowflake ML FORECAST — cumulative enrollment projection for five trials. No Python, no infrastructure. CARDIO-PREVENT-301 ramps fastest — nearly 200 enrollments projected in the first 90 days. But the other four trials show slower, steadier growth over 2+ years. NEURO-AD-302 and CARDIO-AFIB-301 track to about 130 by mid-2028. Even with CARDIO-PREVENT-301's strong start, it needs sustained momentum. The matched patients and screen-fail fixes at TTH are how we maintain that trajectory."
 
 ### [1:55–2:20] PROTOCOL SEARCH (Show: Expand Protocol Knowledge Base)
 
-> "Search 'BMI exclusion criteria' — Cortex Search across 100 protocol documents. Instantly surfaces the relevant section: BMI over 45 is excluded. TTH's population skews heavier. The protocol amendment from two weeks ago relaxed this to BMI 50 — but TTH may not have implemented it. That's your root cause."
+> "Click 'AF prevention anticoagulation protocol' — Cortex Search across 100 protocol documents. Instantly surfaces the Protocol Synopsis and Amendment for CARDIO-PREVENT-301. The amendment shows age limit was raised from 75 to 80 and BMI relaxed from 40 to 45 — specifically because of screen-fail rates at APJ sites. If TTH hasn't implemented this amendment, that explains their 40% screen-fail. One search, root cause identified."
 
 ### [2:20–2:45] AI ASSESSMENT (Show: Expand AI Triage Assessment)
 
-> "One click — Cortex AI reads the trial metrics and generates a triage assessment. Status: AT RISK. Key findings: 29% enrollment, screen-fail concentrated at TTH, protocol amendment not propagated. Recommended actions: activate dormant site outreach, implement amended BMI criteria at TTH, initiate direct patient contact for the 1,500 matched candidates."
+> "One click — Cortex AI reads the trial metrics and generates a triage assessment. Status: AT RISK. Key findings: only 31% enrolled — 1,052 of 3,400 — with 2,348 patients still needed. Screen-fail rate at 8.2% is acceptable overall, but we know from the site chart that TTH is dragging it up locally. Recommended actions: activate additional sites, implement enrollment incentives, conduct site performance review. That's an AI-generated action plan grounded in live data — no analyst needed."
 
 ### [2:45–3:15] CORTEX ANALYST (Show: Expand Ask the Data)
 
@@ -72,24 +78,24 @@ A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III car
 
 ### [3:15–3:40] AMAZON Q (Show: Switch to QuickSight)
 
-> "Different persona, same data. The Medical Director opens Amazon Q in QuickSight: 'Which country has the highest screen-fail rate?' — instant answer, grounded in live Snowflake data. Two personas, one governed platform, zero data copies."
+> "Different persona, same data. The Medical Director opens the Clinical Trials dashboard in QuickSight — enrollment rates, screen-fail rates, all live from Snowflake. Then they ask Amazon Q: 'Which site has the highest screen-fail rate?' — instant answer: Tan Tock Seng, 40%. Same conclusion we reached, but from a completely different interface. Two personas, one governed platform, zero data copies."
 
 ### [3:40–4:00] CLOSE
 
-> "From crisis detection to root cause in under 4 minutes. Dynamic Tables refresh every 5 minutes. ML predicts enrollment trajectory. Cortex Search surfaces protocol details. And Amazon Q gives executives self-service analytics. That's Clinical Trial Operations Intelligence — Snowflake and AWS, better together."
+> "From crisis detection to root cause in under 4 minutes. Dynamic Tables refresh every 5 minutes. ML predicts enrollment trajectory. Cortex Search surfaces protocol details. And Amazon Q gives executives self-service analytics — all grounded in live Snowflake data. That's Clinical Trial Operations Intelligence — Snowflake and AWS, better together."
 
 ---
 
 ## Pre-Recording Checklist
 
 - [ ] Open Streamlit: HEALTHCARE_CLINICAL_TRIALS.APP.CLINICAL_TRIALS_APP
-- [ ] Set Phase filter to "Phase III" only
+- [ ] Set Phase filter to "Phase III" and Therapeutic Area to "Cardiovascular"
 - [ ] Verify map shows sites with green/red color spread
-- [ ] Verify KPIs show ~988 enrolled, ~11% screen-fail
-- [ ] Test "Protocol Knowledge Base" search: "BMI exclusion"
+- [ ] Verify KPIs show 4 trials, 15 sites, ~1,330 enrolled, 8.2% screen-fail
+- [ ] Test "Protocol Knowledge Base" search: "AF prevention anticoagulation protocol"
 - [ ] Test "AI Triage Assessment" button for CARDIO-PREVENT-301
-- [ ] Open QuickSight: https://us-west-2.quicksight.aws.amazon.com/
-- [ ] Test Q topic question: "Which site has the lowest enrollment rate?"
+- [ ] Open QuickSight: https://us-west-2.quicksight.aws.amazon.com/sn/dashboards/hc-trials-dashboard
+- [ ] Test Q topic question: "Which site has the highest screen-fail rate?"
 
 ---
 

@@ -77,15 +77,31 @@ site_df = session.sql(f"""
 if not site_df.empty:
     for col in ["LAT", "LON", "ENROLLED", "ENROLLMENT_PCT", "SCREEN_FAIL_PCT"]:
         site_df[col] = pd.to_numeric(site_df[col], errors="coerce")
-    fig = px.scatter_mapbox(
-        site_df, lat="LAT", lon="LON", size="ENROLLED",
+    site_df = site_df.dropna(subset=["LAT", "LON"])
+    import base64, plotly.graph_objects as go
+    with open("map_bg.png", "rb") as img_file:
+        b64 = base64.b64encode(img_file.read()).decode()
+    fig_geo = px.scatter(
+        site_df, x="LON", y="LAT", size="ENROLLED",
         color="ENROLLMENT_PCT", color_continuous_scale="RdYlGn",
         hover_name="SITE_NAME", hover_data=["CITY", "COUNTRY", "ENROLLED", "ENROLLMENT_PCT", "SCREEN_FAIL_PCT"],
-        mapbox_style="carto-darkmatter", zoom=2, center={"lat": 15, "lon": 110},
         title="Trial Sites — Enrollment Performance (size=enrolled, color=rate %)"
     )
-    fig.update_layout(height=450, margin=dict(t=40, b=10, l=10, r=10))
-    st.plotly_chart(fig, use_container_width=True)
+    fig_geo.update_traces(marker=dict(line=dict(width=1.5, color="DarkSlateGrey"), opacity=0.9))
+    fig_geo.update_layout(
+        height=480, margin=dict(t=40, b=10, l=10, r=10),
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(range=[70, 170], showgrid=False, showticklabels=False, title=""),
+        yaxis=dict(range=[-45, 45], showgrid=False, showticklabels=False, title="", scaleanchor="x"),
+        images=[dict(
+            source=f"data:image/png;base64,{b64}",
+            xref="x", yref="y",
+            x=70, y=45,
+            sizex=100, sizey=90,
+            sizing="stretch", layer="below"
+        )]
+    )
+    st.plotly_chart(fig_geo, use_container_width=True)
 
 with st.expander("📊 Site Performance Deep Dive", expanded=False):
     if not site_df.empty:
@@ -97,37 +113,46 @@ with st.expander("📊 Site Performance Deep Dive", expanded=False):
         st.plotly_chart(fig_bar, use_container_width=True)
 
 with st.expander("🔍 Patient Matching Engine", expanded=False):
-    st.markdown("Patients with eligibility score >= 80 who haven't been approached for enrollment:")
+    st.markdown("Patients with eligibility score >= 85 who haven't been approached for enrollment:")
+    total_eligible = session.sql("""
+        SELECT COUNT(*) AS CNT
+        FROM HEALTHCARE_CLINICAL_TRIALS.CURATED.PATIENT_ELIGIBILITY
+        WHERE ELIGIBILITY_SCORE >= 85 AND APPROACH_STATUS = 'NOT_APPROACHED'
+    """).to_pandas()['CNT'].iloc[0]
     eligible = session.sql("""
         SELECT p.PATIENT_ID, p.FIRST_NAME || ' ' || p.LAST_NAME AS NAME,
-               DATEDIFF('year', p.DOB, CURRENT_DATE()) AS AGE, p.GENDER, p.COUNTRY,
-               p.CHRONIC_CONDITIONS, pe.ELIGIBILITY_SCORE
+               DATEDIFF('year', p.DATE_OF_BIRTH, CURRENT_DATE()) AS AGE, p.GENDER, p.COUNTRY,
+               p.CHRONIC_CONDITIONS, pe.TRIAL_TITLE, pe.ELIGIBILITY_SCORE
         FROM HEALTHCARE_CLINICAL_TRIALS.CURATED.PATIENT_ELIGIBILITY pe
         JOIN HEALTHCARE_CLINICAL_TRIALS.RAW.PATIENTS p ON pe.PATIENT_ID = p.PATIENT_ID
-        WHERE pe.ELIGIBILITY_SCORE >= 80 AND pe.APPROACH_STATUS = 'NOT_APPROACHED'
-        ORDER BY pe.ELIGIBILITY_SCORE DESC
+        WHERE pe.ELIGIBILITY_SCORE >= 85 AND pe.APPROACH_STATUS = 'NOT_APPROACHED'
+        QUALIFY ROW_NUMBER() OVER (PARTITION BY pe.TRIAL_TITLE ORDER BY pe.ELIGIBILITY_SCORE DESC) <= 4
+        ORDER BY pe.ELIGIBILITY_SCORE DESC, pe.TRIAL_TITLE
         LIMIT 20
     """).to_pandas()
     if not eligible.empty:
-        st.metric("High-Score Unapproached Patients", f"{len(eligible)}+ (showing top 20)")
+        st.metric("High-Score Unapproached Patients", f"{total_eligible:,} (showing top 20)")
         st.dataframe(eligible, use_container_width=True)
 
 with st.expander("📈 Enrollment Forecast", expanded=False):
     forecast = session.sql("""
-        SELECT SERIES AS TRIAL, TS AS FORECAST_DATE, ROUND(FORECAST, 0) AS PREDICTED_ENROLLMENTS
+        SELECT SERIES AS TRIAL, TS AS FORECAST_DATE, FORECAST AS DAILY_RATE,
+               SUM(FORECAST) OVER (PARTITION BY SERIES ORDER BY TS) AS CUMULATIVE_ENROLLMENTS
         FROM HEALTHCARE_CLINICAL_TRIALS.ML.ENROLLMENT_FORECAST_RESULTS
+        WHERE SERIES IN ('CARDIO-PREVENT-301','CARDIO-AFIB-301','ONCO-BREAST-301','NEURO-AD-302','RESP-COPD-301')
         ORDER BY SERIES, TS
     """).to_pandas()
     if not forecast.empty:
-        forecast["PREDICTED_ENROLLMENTS"] = pd.to_numeric(forecast["PREDICTED_ENROLLMENTS"], errors="coerce")
-        fig_fc = px.line(forecast, x="FORECAST_DATE", y="PREDICTED_ENROLLMENTS", color="TRIAL",
-                         title="14-Day Enrollment Forecast by Trial (Snowflake ML)")
+        forecast["CUMULATIVE_ENROLLMENTS"] = pd.to_numeric(forecast["CUMULATIVE_ENROLLMENTS"], errors="coerce")
+        fig_fc = px.line(forecast, x="FORECAST_DATE", y="CUMULATIVE_ENROLLMENTS", color="TRIAL",
+                         title="Cumulative Enrollment Forecast — Top Trials (Snowflake ML)",
+                         render_mode="svg")
         fig_fc.update_layout(height=350, margin=dict(t=40, b=10))
         st.plotly_chart(fig_fc, use_container_width=True)
 
 with st.expander("📚 Protocol Knowledge Base (Cortex Search)", expanded=False):
     st.markdown("Search trial protocols and eligibility criteria:")
-    samples = ["heart failure inclusion criteria", "exclusion criteria BMI", "informed consent withdrawal process"]
+    samples = ["AF prevention anticoagulation protocol", "BMI age exclusion amendment", "screen fail eligibility criteria"]
     cols = st.columns(3)
     selected = None
     for i, s in enumerate(samples):
@@ -146,9 +171,12 @@ with st.expander("📚 Protocol Knowledge Base (Cortex Search)", expanded=False)
                     ) AS RESULTS
                 """).collect()[0][0]
                 results = json.loads(raw) if isinstance(raw, str) else raw
-                for r in results.get("results", []):
+                for idx, r in enumerate(results.get("results", [])):
                     st.markdown(f"**{r.get('TITLE', 'Document')}** ({r.get('CATEGORY', '')})")
-                    st.caption(r.get("CONTENT", "")[:300] + "...")
+                    content = r.get("CONTENT", "")
+                    st.caption(content[:200] + "...")
+                    if st.checkbox("View full document", key=f"doc_{idx}"):
+                        st.markdown(content)
                     st.divider()
             except Exception as e:
                 st.error(f"Search error: {e}")
@@ -197,7 +225,7 @@ with st.expander("💬 Ask the Data (Cortex Analyst)", expanded=False):
                             st.markdown(block.get("text", ""))
                         elif block.get("type") == "sql":
                             sql = block.get("statement", "")
-                            with st.expander("Generated SQL", expanded=False):
+                            if st.checkbox("Show generated SQL", key="show_sql"):
                                 st.code(sql, language="sql")
                             try:
                                 answer_df = session.sql(sql).to_pandas()

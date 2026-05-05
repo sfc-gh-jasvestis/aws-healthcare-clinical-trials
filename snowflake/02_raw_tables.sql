@@ -130,55 +130,105 @@ CREATE OR REPLACE TABLE PATIENTS (
     DIABETES_STATUS VARCHAR(20),
     HYPERTENSION VARCHAR(5),
     CHOLESTEROL_LEVEL FLOAT,
+    CHRONIC_CONDITIONS VARCHAR(200),
     CREATED_AT TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
 INSERT INTO PATIENTS
+(PATIENT_ID, FIRST_NAME, LAST_NAME, DATE_OF_BIRTH, GENDER, ETHNICITY, COUNTRY, SITE_ID, BMI, SMOKING_STATUS, DIABETES_STATUS, HYPERTENSION, CHOLESTEROL_LEVEL, CHRONIC_CONDITIONS)
+WITH BASE AS (
+    SELECT
+        SEQ4() AS RN,
+        CASE UNIFORM(0, 7, RANDOM())
+            WHEN 0 THEN 'Singapore' WHEN 1 THEN 'Singapore' WHEN 2 THEN 'Japan'
+            WHEN 3 THEN 'India' WHEN 4 THEN 'South Korea' WHEN 5 THEN 'Thailand'
+            WHEN 6 THEN 'Australia' WHEN 7 THEN 'China'
+        END AS COUNTRY,
+        CASE WHEN UNIFORM(0, 1, RANDOM()) = 0 THEN 'Male' ELSE 'Female' END AS GENDER
+    FROM TABLE(GENERATOR(ROWCOUNT => 10000))
+)
 SELECT
-    'PAT-' || LPAD(SEQ4()::VARCHAR, 5, '0'),
-    CASE MOD(SEQ4(), 30)
-        WHEN 0 THEN 'Wei' WHEN 1 THEN 'Mei' WHEN 2 THEN 'Kenji' WHEN 3 THEN 'Yuki'
-        WHEN 4 THEN 'Raj' WHEN 5 THEN 'Priya' WHEN 6 THEN 'Jin' WHEN 7 THEN 'Hana'
-        WHEN 8 THEN 'Somchai' WHEN 9 THEN 'Siti' WHEN 10 THEN 'Min' WHEN 11 THEN 'Aiko'
-        WHEN 12 THEN 'Vikram' WHEN 13 THEN 'Ananya' WHEN 14 THEN 'Hiroshi' WHEN 15 THEN 'Sakura'
-        WHEN 16 THEN 'Arjun' WHEN 17 THEN 'Noor' WHEN 18 THEN 'Takeshi' WHEN 19 THEN 'Lien'
-        WHEN 20 THEN 'Dong' WHEN 21 THEN 'Soo-Jin' WHEN 22 THEN 'Ravi' WHEN 23 THEN 'Aisha'
-        WHEN 24 THEN 'Kenta' WHEN 25 THEN 'Lalita' WHEN 26 THEN 'Jun' WHEN 27 THEN 'Mei-Ling'
-        WHEN 28 THEN 'Deepak' WHEN 29 THEN 'Yumi'
+    'PAT-' || LPAD(RN::VARCHAR, 5, '0'),
+    CASE
+        WHEN COUNTRY = 'Singapore' AND GENDER = 'Male' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Wei' WHEN 1 THEN 'Jun' WHEN 2 THEN 'Liang' WHEN 3 THEN 'Zhi' WHEN 4 THEN 'Ahmad' WHEN 5 THEN 'Hao' WHEN 6 THEN 'Rajan' WHEN 7 THEN 'Kai' WHEN 8 THEN 'Zheng' WHEN 9 THEN 'Hafiz' WHEN 10 THEN 'Boon' WHEN 11 THEN 'Cheng' WHEN 12 THEN 'Ismail' WHEN 13 THEN 'Kian' ELSE 'Teck' END
+        WHEN COUNTRY = 'Singapore' AND GENDER = 'Female' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Mei' WHEN 1 THEN 'Hui' WHEN 2 THEN 'Siti' WHEN 3 THEN 'Yan' WHEN 4 THEN 'Nurul' WHEN 5 THEN 'Ling' WHEN 6 THEN 'Fang' WHEN 7 THEN 'Xin' WHEN 8 THEN 'Ai' WHEN 9 THEN 'Fatimah' WHEN 10 THEN 'Jing' WHEN 11 THEN 'Li Hua' WHEN 12 THEN 'Aminah' WHEN 13 THEN 'Sze' ELSE 'Pei' END
+        WHEN COUNTRY = 'Japan' AND GENDER = 'Male' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Kenji' WHEN 1 THEN 'Hiroshi' WHEN 2 THEN 'Takeshi' WHEN 3 THEN 'Kenta' WHEN 4 THEN 'Ren' WHEN 5 THEN 'Daiki' WHEN 6 THEN 'Yuto' WHEN 7 THEN 'Haruki' WHEN 8 THEN 'Sota' WHEN 9 THEN 'Riku' WHEN 10 THEN 'Kaito' WHEN 11 THEN 'Shota' WHEN 12 THEN 'Hayato' WHEN 13 THEN 'Ryota' ELSE 'Tatsuki' END
+        WHEN COUNTRY = 'Japan' AND GENDER = 'Female' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Yuki' WHEN 1 THEN 'Sakura' WHEN 2 THEN 'Aiko' WHEN 3 THEN 'Yumi' WHEN 4 THEN 'Hana' WHEN 5 THEN 'Miku' WHEN 6 THEN 'Rin' WHEN 7 THEN 'Mei' WHEN 8 THEN 'Akari' WHEN 9 THEN 'Nanami' WHEN 10 THEN 'Koharu' WHEN 11 THEN 'Himari' WHEN 12 THEN 'Yuna' WHEN 13 THEN 'Saki' ELSE 'Misaki' END
+        WHEN COUNTRY = 'India' AND GENDER = 'Male' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Raj' WHEN 1 THEN 'Vikram' WHEN 2 THEN 'Arjun' WHEN 3 THEN 'Deepak' WHEN 4 THEN 'Ravi' WHEN 5 THEN 'Suresh' WHEN 6 THEN 'Amit' WHEN 7 THEN 'Rahul' WHEN 8 THEN 'Sanjay' WHEN 9 THEN 'Nikhil' WHEN 10 THEN 'Pranav' WHEN 11 THEN 'Aditya' WHEN 12 THEN 'Karthik' WHEN 13 THEN 'Manoj' ELSE 'Venkat' END
+        WHEN COUNTRY = 'India' AND GENDER = 'Female' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Priya' WHEN 1 THEN 'Ananya' WHEN 2 THEN 'Aisha' WHEN 3 THEN 'Neha' WHEN 4 THEN 'Kavitha' WHEN 5 THEN 'Lakshmi' WHEN 6 THEN 'Divya' WHEN 7 THEN 'Sneha' WHEN 8 THEN 'Pooja' WHEN 9 THEN 'Meera' WHEN 10 THEN 'Shruti' WHEN 11 THEN 'Isha' WHEN 12 THEN 'Tanvi' WHEN 13 THEN 'Anjali' ELSE 'Swathi' END
+        WHEN COUNTRY = 'South Korea' AND GENDER = 'Male' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Min-Jun' WHEN 1 THEN 'Jae' WHEN 2 THEN 'Hyun' WHEN 3 THEN 'Dong' WHEN 4 THEN 'Seung' WHEN 5 THEN 'Tae' WHEN 6 THEN 'Jun-Ho' WHEN 7 THEN 'Sung' WHEN 8 THEN 'Woo-Jin' WHEN 9 THEN 'Joon' WHEN 10 THEN 'Kyung' WHEN 11 THEN 'Chang' WHEN 12 THEN 'Dae' WHEN 13 THEN 'Byung' ELSE 'Yong' END
+        WHEN COUNTRY = 'South Korea' AND GENDER = 'Female' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Soo-Jin' WHEN 1 THEN 'Eun' WHEN 2 THEN 'Ji-Yeon' WHEN 3 THEN 'Yoon' WHEN 4 THEN 'Hye' WHEN 5 THEN 'Min-Seo' WHEN 6 THEN 'Da-Eun' WHEN 7 THEN 'Ha-Na' WHEN 8 THEN 'Su-Bin' WHEN 9 THEN 'Ye-Jin' WHEN 10 THEN 'Seo-Yeon' WHEN 11 THEN 'Chae' WHEN 12 THEN 'Bo-Ram' WHEN 13 THEN 'Ga-Eun' ELSE 'Nari' END
+        WHEN COUNTRY = 'Thailand' AND GENDER = 'Male' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Somchai' WHEN 1 THEN 'Chai' WHEN 2 THEN 'Anan' WHEN 3 THEN 'Boon' WHEN 4 THEN 'Nattapong' WHEN 5 THEN 'Prasit' WHEN 6 THEN 'Wichai' WHEN 7 THEN 'Krit' WHEN 8 THEN 'Tanawat' WHEN 9 THEN 'Panya' WHEN 10 THEN 'Sukit' WHEN 11 THEN 'Thana' WHEN 12 THEN 'Anon' WHEN 13 THEN 'Prawit' ELSE 'Viroj' END
+        WHEN COUNTRY = 'Thailand' AND GENDER = 'Female' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Lalita' WHEN 1 THEN 'Noor' WHEN 2 THEN 'Pim' WHEN 3 THEN 'Siri' WHEN 4 THEN 'Kanya' WHEN 5 THEN 'Mali' WHEN 6 THEN 'Ploy' WHEN 7 THEN 'Nipa' WHEN 8 THEN 'Araya' WHEN 9 THEN 'Chompoo' WHEN 10 THEN 'Dao' WHEN 11 THEN 'Kaew' WHEN 12 THEN 'Malee' WHEN 13 THEN 'Rung' ELSE 'Wanna' END
+        WHEN COUNTRY = 'Australia' AND GENDER = 'Male' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'James' WHEN 1 THEN 'Liam' WHEN 2 THEN 'Jack' WHEN 3 THEN 'Noah' WHEN 4 THEN 'Ethan' WHEN 5 THEN 'Oliver' WHEN 6 THEN 'William' WHEN 7 THEN 'Thomas' WHEN 8 THEN 'Henry' WHEN 9 THEN 'Lucas' WHEN 10 THEN 'Alexander' WHEN 11 THEN 'Daniel' WHEN 12 THEN 'Samuel' WHEN 13 THEN 'Benjamin' ELSE 'Ryan' END
+        WHEN COUNTRY = 'Australia' AND GENDER = 'Female' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Sarah' WHEN 1 THEN 'Emma' WHEN 2 THEN 'Olivia' WHEN 3 THEN 'Chloe' WHEN 4 THEN 'Mia' WHEN 5 THEN 'Charlotte' WHEN 6 THEN 'Amelia' WHEN 7 THEN 'Sophie' WHEN 8 THEN 'Grace' WHEN 9 THEN 'Isla' WHEN 10 THEN 'Ava' WHEN 11 THEN 'Harper' WHEN 12 THEN 'Lily' WHEN 13 THEN 'Ella' ELSE 'Ruby' END
+        WHEN COUNTRY = 'China' AND GENDER = 'Male' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Wei' WHEN 1 THEN 'Jin' WHEN 2 THEN 'Dong' WHEN 3 THEN 'Chao' WHEN 4 THEN 'Ming' WHEN 5 THEN 'Hao' WHEN 6 THEN 'Tao' WHEN 7 THEN 'Lei' WHEN 8 THEN 'Peng' WHEN 9 THEN 'Bo' WHEN 10 THEN 'Feng' WHEN 11 THEN 'Long' WHEN 12 THEN 'Jian' WHEN 13 THEN 'Xiang' ELSE 'Yong' END
+        WHEN COUNTRY = 'China' AND GENDER = 'Female' THEN
+            CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Mei-Ling' WHEN 1 THEN 'Xiao' WHEN 2 THEN 'Lien' WHEN 3 THEN 'Fang' WHEN 4 THEN 'Hua' WHEN 5 THEN 'Li-Na' WHEN 6 THEN 'Yan' WHEN 7 THEN 'Jing' WHEN 8 THEN 'Xue' WHEN 9 THEN 'Ying' WHEN 10 THEN 'Lan' WHEN 11 THEN 'Qing' WHEN 12 THEN 'Rui' WHEN 13 THEN 'Shan' ELSE 'Ting' END
     END,
-    CASE MOD(SEQ4(), 20)
-        WHEN 0 THEN 'Tan' WHEN 1 THEN 'Wong' WHEN 2 THEN 'Yamamoto' WHEN 3 THEN 'Suzuki'
-        WHEN 4 THEN 'Kumar' WHEN 5 THEN 'Sharma' WHEN 6 THEN 'Chen' WHEN 7 THEN 'Kim'
-        WHEN 8 THEN 'Patel' WHEN 9 THEN 'Lee' WHEN 10 THEN 'Park' WHEN 11 THEN 'Nguyen'
-        WHEN 12 THEN 'Singh' WHEN 13 THEN 'Tanaka' WHEN 14 THEN 'Lim' WHEN 15 THEN 'Wang'
-        WHEN 16 THEN 'Sato' WHEN 17 THEN 'Zhang' WHEN 18 THEN 'Gupta' WHEN 19 THEN 'Choi'
+    CASE COUNTRY
+        WHEN 'Singapore' THEN CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Tan' WHEN 1 THEN 'Lim' WHEN 2 THEN 'Lee' WHEN 3 THEN 'Wong' WHEN 4 THEN 'Chen' WHEN 5 THEN 'Ng' WHEN 6 THEN 'Ibrahim' WHEN 7 THEN 'Raj' WHEN 8 THEN 'Goh' WHEN 9 THEN 'Chua' WHEN 10 THEN 'Ong' WHEN 11 THEN 'Koh' WHEN 12 THEN 'Teo' WHEN 13 THEN 'Yeo' ELSE 'Ho' END
+        WHEN 'Japan' THEN CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Yamamoto' WHEN 1 THEN 'Suzuki' WHEN 2 THEN 'Tanaka' WHEN 3 THEN 'Sato' WHEN 4 THEN 'Watanabe' WHEN 5 THEN 'Ito' WHEN 6 THEN 'Takahashi' WHEN 7 THEN 'Nakamura' WHEN 8 THEN 'Kobayashi' WHEN 9 THEN 'Saito' WHEN 10 THEN 'Kato' WHEN 11 THEN 'Yoshida' WHEN 12 THEN 'Yamada' WHEN 13 THEN 'Matsumoto' ELSE 'Inoue' END
+        WHEN 'India' THEN CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Kumar' WHEN 1 THEN 'Sharma' WHEN 2 THEN 'Patel' WHEN 3 THEN 'Singh' WHEN 4 THEN 'Gupta' WHEN 5 THEN 'Reddy' WHEN 6 THEN 'Nair' WHEN 7 THEN 'Verma' WHEN 8 THEN 'Joshi' WHEN 9 THEN 'Iyer' WHEN 10 THEN 'Menon' WHEN 11 THEN 'Rao' WHEN 12 THEN 'Das' WHEN 13 THEN 'Pillai' ELSE 'Chatterjee' END
+        WHEN 'South Korea' THEN CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Kim' WHEN 1 THEN 'Park' WHEN 2 THEN 'Lee' WHEN 3 THEN 'Choi' WHEN 4 THEN 'Jung' WHEN 5 THEN 'Kang' WHEN 6 THEN 'Yoon' WHEN 7 THEN 'Han' WHEN 8 THEN 'Lim' WHEN 9 THEN 'Shin' WHEN 10 THEN 'Oh' WHEN 11 THEN 'Seo' WHEN 12 THEN 'Kwon' WHEN 13 THEN 'Hwang' ELSE 'Ahn' END
+        WHEN 'Thailand' THEN CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Srisai' WHEN 1 THEN 'Thongkham' WHEN 2 THEN 'Chaiyasit' WHEN 3 THEN 'Wongsawat' WHEN 4 THEN 'Phanit' WHEN 5 THEN 'Rattana' WHEN 6 THEN 'Siriwong' WHEN 7 THEN 'Prasert' WHEN 8 THEN 'Boonmee' WHEN 9 THEN 'Saetang' WHEN 10 THEN 'Jaidee' WHEN 11 THEN 'Kongtip' WHEN 12 THEN 'Somboon' WHEN 13 THEN 'Pongsakul' ELSE 'Maneerat' END
+        WHEN 'Australia' THEN CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Mitchell' WHEN 1 THEN 'Patterson' WHEN 2 THEN 'Smith' WHEN 3 THEN 'Williams' WHEN 4 THEN 'Brown' WHEN 5 THEN 'Jones' WHEN 6 THEN 'Wilson' WHEN 7 THEN 'Taylor' WHEN 8 THEN 'Anderson' WHEN 9 THEN 'Thomas' WHEN 10 THEN 'Jackson' WHEN 11 THEN 'White' WHEN 12 THEN 'Harris' WHEN 13 THEN 'Martin' ELSE 'Thompson' END
+        WHEN 'China' THEN CASE UNIFORM(0, 14, RANDOM()) WHEN 0 THEN 'Zhang' WHEN 1 THEN 'Wang' WHEN 2 THEN 'Li' WHEN 3 THEN 'Chen' WHEN 4 THEN 'Liu' WHEN 5 THEN 'Yang' WHEN 6 THEN 'Huang' WHEN 7 THEN 'Zhou' WHEN 8 THEN 'Wu' WHEN 9 THEN 'Xu' WHEN 10 THEN 'Sun' WHEN 11 THEN 'Ma' WHEN 12 THEN 'Zhu' WHEN 13 THEN 'Hu' ELSE 'Guo' END
     END,
     DATEADD('day', -UNIFORM(18*365, 85*365, RANDOM()), CURRENT_DATE()),
-    CASE WHEN UNIFORM(0, 1, RANDOM()) = 0 THEN 'Male' ELSE 'Female' END,
-    CASE MOD(SEQ4(), 8)
-        WHEN 0 THEN 'Chinese' WHEN 1 THEN 'Malay' WHEN 2 THEN 'Japanese'
-        WHEN 3 THEN 'Indian' WHEN 4 THEN 'Korean' WHEN 5 THEN 'Thai'
-        WHEN 6 THEN 'Vietnamese' WHEN 7 THEN 'Filipino'
+    GENDER,
+    CASE COUNTRY
+        WHEN 'Singapore' THEN CASE UNIFORM(0, 2, RANDOM()) WHEN 0 THEN 'Chinese' WHEN 1 THEN 'Malay' ELSE 'Indian' END
+        WHEN 'Japan' THEN 'Japanese'
+        WHEN 'India' THEN 'Indian'
+        WHEN 'South Korea' THEN 'Korean'
+        WHEN 'Thailand' THEN 'Thai'
+        WHEN 'Australia' THEN CASE UNIFORM(0, 2, RANDOM()) WHEN 0 THEN 'Caucasian' WHEN 1 THEN 'Chinese' ELSE 'Indian' END
+        WHEN 'China' THEN 'Chinese'
     END,
-    CASE MOD(SEQ4(), 8)
-        WHEN 0 THEN 'Singapore' WHEN 1 THEN 'Singapore' WHEN 2 THEN 'Japan'
-        WHEN 3 THEN 'India' WHEN 4 THEN 'South Korea' WHEN 5 THEN 'Thailand'
-        WHEN 6 THEN 'Australia' WHEN 7 THEN 'China'
-    END,
-    'SITE-' || LPAD((MOD(SEQ4(), 15) + 1)::VARCHAR, 3, '0'),
+    COUNTRY,
+    'SITE-' || LPAD((MOD(RN, 15) + 1)::VARCHAR, 3, '0'),
     ROUND(UNIFORM(18.0, 42.0, RANDOM())::FLOAT, 1),
-    CASE MOD(SEQ4(), 5)
-        WHEN 0 THEN 'Never' WHEN 1 THEN 'Former' WHEN 2 THEN 'Current'
-        WHEN 3 THEN 'Never' WHEN 4 THEN 'Never'
-    END,
-    CASE MOD(SEQ4(), 6)
-        WHEN 0 THEN 'None' WHEN 1 THEN 'Pre-diabetic' WHEN 2 THEN 'Type 2'
-        WHEN 3 THEN 'None' WHEN 4 THEN 'None' WHEN 5 THEN 'Type 1'
-    END,
+    CASE UNIFORM(0, 4, RANDOM()) WHEN 0 THEN 'Never' WHEN 1 THEN 'Former' WHEN 2 THEN 'Current' WHEN 3 THEN 'Never' ELSE 'Never' END,
+    CASE UNIFORM(0, 5, RANDOM()) WHEN 0 THEN 'None' WHEN 1 THEN 'Pre-diabetic' WHEN 2 THEN 'Type 2' WHEN 3 THEN 'None' WHEN 4 THEN 'None' ELSE 'Type 1' END,
     CASE WHEN UNIFORM(0, 3, RANDOM()) = 0 THEN 'Yes' ELSE 'No' END,
     ROUND(UNIFORM(120.0, 320.0, RANDOM())::FLOAT, 0),
-    CURRENT_TIMESTAMP()
-FROM TABLE(GENERATOR(ROWCOUNT => 10000));
+    CASE UNIFORM(0, 19, RANDOM())
+        WHEN 0 THEN 'Atrial Fibrillation'
+        WHEN 1 THEN 'Atrial Fibrillation, Hypertension'
+        WHEN 2 THEN 'Type 2 Diabetes'
+        WHEN 3 THEN 'Type 2 Diabetes, Hypertension'
+        WHEN 4 THEN 'COPD'
+        WHEN 5 THEN 'Asthma'
+        WHEN 6 THEN 'Heart Failure'
+        WHEN 7 THEN 'Heart Failure, Atrial Fibrillation'
+        WHEN 8 THEN 'Obesity'
+        WHEN 9 THEN 'Obesity, Type 2 Diabetes'
+        WHEN 10 THEN 'Rheumatoid Arthritis'
+        WHEN 11 THEN 'Psoriasis'
+        WHEN 12 THEN 'Cancer History'
+        WHEN 13 THEN 'Alzheimer Disease'
+        WHEN 14 THEN 'Multiple Sclerosis'
+        WHEN 15 THEN 'Chronic Kidney Disease'
+        WHEN 16 THEN 'Anticoagulation Therapy'
+        WHEN 17 THEN 'None'
+        WHEN 18 THEN 'None'
+        WHEN 19 THEN 'Hypertension'
+    END
+FROM BASE;
 
 ------------------------------------------------------------------------
 -- ENROLLMENTS (5,000 rows - skewed toward CARDIO-PREVENT-301)
