@@ -4,27 +4,21 @@ End-to-end demo showing how Snowflake + AWS accelerate clinical trial enrollment
 
 ## Architecture
 
+A clinical trial operations and patient recruitment platform built on **Snowflake** (Dynamic Tables, ML.FORECAST, Cortex Search, semantic view, Cortex Agent) and **AWS** (S3, Comprehend Medical, QuickSight + Amazon Q). Trial documents land in S3; Comprehend Medical extracts entities; Snowflake forecasts enrollment and matches patients; the coordinator drives the trial from Streamlit while leadership reads QuickSight.
+
+```mermaid
+flowchart LR
+    S3[S3 trial documents + EHR exports] --> SF[Snowflake RAW + CURATED Dynamic Tables]
+    S3 --> CM[Amazon Comprehend Medical entity extraction]
+    CM --> SF
+    SF --> ML[ML.FORECAST enrollment]
+    SF --> CSearch[Cortex Search trial protocols]
+    SF --> SemView[Semantic View]
+    SF --> AGT[Cortex Agent Snowflake Intelligence]
+    SF --> ST[Streamlit Trial Operations]
+    SF --> QS[QuickSight + Amazon Q]
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         Clinical Trial Operations                            │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌──────────┐    ┌──────────────────────────────────────┐    ┌───────────┐  │
-│  │          │    │           SNOWFLAKE                   │    │           │  │
-│  │   S3     │───▶│  RAW → CURATED (Dynamic Tables)      │───▶│ Streamlit │  │
-│  │  Bucket  │    │  ML (Forecast) │ Search (Cortex)     │    │   App     │  │
-│  │          │    │  AI (Agent)    │ Semantic View        │    │           │  │
-│  └──────────┘    └──────────────────────────────────────┘    └───────────┘  │
-│       │                         │                                  │         │
-│       │                         │                                  │         │
-│       ▼                         ▼                                  ▼         │
-│  ┌──────────┐    ┌──────────────────────────────────────┐    ┌───────────┐  │
-│  │Comprehend│    │  Snowflake Intelligence               │    │QuickSight │  │
-│  │ Medical  │    │  (Cortex Agent)                       │    │  + Q      │  │
-│  └──────────┘    └──────────────────────────────────────┘    └───────────┘  │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+
 
 ## What It Does
 
