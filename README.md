@@ -14,10 +14,30 @@ flowchart LR
     SF --> ML[ML.FORECAST enrollment]
     SF --> CSearch[Cortex Search trial protocols]
     SF --> SemView[Semantic View]
-    SF --> AGT[Cortex Agent Snowflake Intelligence]
+    SF --> AGT[Cortex Agent]
     SF --> ST[Streamlit Trial Operations]
     SF --> QS[QuickSight + Amazon Q]
 ```
+
+## Snowflake Capabilities
+
+| Capability | Implementation |
+|-----------|---------------|
+| Dynamic Tables | RAW → CURATED pipeline with 5-min refresh |
+| ML Functions | ML.FORECAST enrollment predictions by trial/site |
+| Cortex Search | 100 trial protocol documents indexed |
+| Cortex Agent | ClinicalTrialsAnalyst + ProtocolSearch tools |
+| Semantic View | Structured analytics over enrollment, sites, visits |
+| Streamlit | Multi-page trial operations dashboard |
+
+## AWS Services
+
+| Service | Role in Demo |
+|---------|-------------|
+| Amazon S3 | Landing zone for trial documents and EHR exports |
+| Amazon Comprehend Medical | Entity extraction from clinical text (NER) |
+| Amazon QuickSight | Executive enrollment dashboard with direct query |
+| Amazon Q | Natural language analytics for VP Clinical Development |
 
 ## Personas
 

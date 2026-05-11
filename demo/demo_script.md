@@ -7,7 +7,7 @@
 
 ## The Story
 
-A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III cardiovascular trial (CARDIO-PREVENT-301) is critically behind schedule. 1,330 patients enrolled across 4 cardiovascular trials against a combined target well over 10,000. At this rate, they'll miss their FDA submission window. Using the Clinical Trials Intelligence platform, they investigate site performance, match eligible patients, and forecast completion — all from a single Snowflake-powered dashboard.
+A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III cardiovascular trial (CARDIO-PREVENT-301) is critically behind schedule. 1,553 patients enrolled across 5 cardiovascular trials against a combined target well over 12,000. At this rate, they'll miss their FDA submission window. Using the Clinical Trials Intelligence platform, they investigate site performance, match eligible patients, and forecast completion — all from a single Snowflake-powered dashboard.
 
 ---
 
@@ -46,7 +46,7 @@ A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III car
 
 ### [0:00–0:15] THE CRISIS (Show: Streamlit app, KPI cards — Phase III + Cardiovascular filter)
 
-> "4 active Phase III cardiovascular trials, 15 sites across Asia-Pacific, 1,330 patients enrolled. But CARDIO-PREVENT-301 — our flagship — target is 3,400. We're at 1,052 — not even a third. Screen-fail rate at 8.2%. At this pace, we miss our FDA submission window. Let's find out where the problem is."
+> "5 active Phase III cardiovascular trials, 15 sites across Asia-Pacific, 1,553 patients enrolled. But CARDIO-PREVENT-301 — our flagship — target is 3,400. We're at 1,052 — not even a third. Screen-fail rate at 8.2%. At this pace, we miss our FDA submission window. Let's find out where the problem is."
 
 ### [0:15–0:40] SITE MAP (Show: Trial Sites scatter map)
 
@@ -91,7 +91,7 @@ A VP of Clinical Operations at AsiaPharma discovers their flagship Phase III car
 - [ ] Open Streamlit: HEALTHCARE_CLINICAL_TRIALS.APP.CLINICAL_TRIALS_APP
 - [ ] Set Phase filter to "Phase III" and Therapeutic Area to "Cardiovascular"
 - [ ] Verify map shows sites with green/red color spread
-- [ ] Verify KPIs show 4 trials, 15 sites, ~1,330 enrolled, 8.2% screen-fail
+- [ ] Verify KPIs show 5 trials, 15 sites, ~1,553 enrolled, 8.2% screen-fail
 - [ ] Test "Protocol Knowledge Base" search: "AF prevention anticoagulation protocol"
 - [ ] Test "AI Triage Assessment" button for CARDIO-PREVENT-301
 - [ ] Open QuickSight: https://us-west-2.quicksight.aws.amazon.com/sn/dashboards/hc-trials-dashboard
