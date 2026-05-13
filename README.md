@@ -85,6 +85,14 @@ snowsql -f snowflake/07_agent.sql
 HEALTHCARE_CLINICAL_TRIALS.APP.TRIAL_OPERATIONS_APP
 ```
 
+## Build Modes
+
+### Snowflake Only
+Run the SQL scripts in `snowflake/` (skip `01_integrations.sql`) and deploy the Streamlit app from `streamlit/deploy/`. Uses Cortex AI instead of Bedrock, and Snowflake Intelligence instead of QuickSight.
+
+### Full AWS + Snowflake
+Run all SQL scripts including `01_integrations.sql`, deploy the main Streamlit app from `streamlit/`, then run the QuickSight setup from `quicksight/`.
+
 ## Key Demo Numbers
 
 - **CARDIO-PREVENT-301** at 31% enrollment (1,054/3,400) — board meeting in 6 weeks
